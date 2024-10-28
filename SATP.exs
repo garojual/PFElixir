@@ -1,6 +1,6 @@
 defmodule SATP do
   def run(file_path) do
-    :observer.start()
+    start_time = System.monotonic_time(:millisecond)
     {num_vars, clauses} = read_file(file_path)
 
     IO.puts("Número de variables: #{num_vars}")
@@ -8,6 +8,7 @@ defmodule SATP do
 
     # Definir el número de tareas (procesos) en paralelo
     num_tasks = System.schedulers_online() # Usa el número de núcleos disponibles como referencia
+    IO.puts(num_tasks)
     combinations_per_task = trunc(:math.pow(2, num_vars) / num_tasks)
 
     tasks =
@@ -31,6 +32,9 @@ defmodule SATP do
 
     # Esperar a que todas las tareas finalicen
     Enum.each(tasks, &Task.await(&1, :infinity))
+    end_time = System.monotonic_time(:millisecond)
+    duration = end_time - start_time
+    IO.puts("Tiempo de ejecución: #{duration} ms")
   end
 
   defp read_file(file_path) do

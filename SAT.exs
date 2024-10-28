@@ -1,6 +1,6 @@
 defmodule SAT do
   def run(file_path) do
-    :observer.start()
+    start_time = System.monotonic_time(:millisecond)
     {num_vars, clauses} = read_file(file_path)
 
     IO.puts("Número de variables: #{num_vars}")
@@ -15,7 +15,11 @@ defmodule SAT do
       if satisfies?(padded_combination, clauses) do
         IO.puts("Satisface: #{padded_combination}")
       end
+
     end
+    end_time = System.monotonic_time(:millisecond)
+    duration = end_time - start_time
+    IO.puts("Tiempo de ejecución: #{duration} ms")
   end
 
   defp read_file(file_path) do
