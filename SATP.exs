@@ -1,4 +1,4 @@
-defmodule SAT do
+defmodule SATP do
   def run(file_path) do
     :observer.start()
     {num_vars, clauses} = read_file(file_path)
@@ -6,16 +6,31 @@ defmodule SAT do
     IO.puts("Número de variables: #{num_vars}")
     IO.puts("Número de cláusulas: #{length(clauses)}")
 
-    # Generar todas las combinaciones posibles de valores para las variables
-    for combination <- 0..(trunc(:math.pow(2, num_vars)) - 1) do
-      binary_combination = Integer.to_string(combination, 2)
-      padded_combination = String.pad_leading(binary_combination, num_vars, "0")
+    # Definir el número de tareas (procesos) en paralelo
+    num_tasks = System.schedulers_online() # Usa el número de núcleos disponibles como referencia
+    combinations_per_task = trunc(:math.pow(2, num_vars) / num_tasks)
 
-      # Verificar si la combinación satisface todas las cláusulas
-      if satisfies?(padded_combination, clauses) do
-        IO.puts("Satisface: #{padded_combination}")
+    tasks =
+      for i <- 0..(num_tasks - 1) do
+        Task.async(fn ->
+          # Generar las combinaciones para este bloque de tareas
+          start = i * combinations_per_task
+          finish = if i == num_tasks - 1, do: trunc(:math.pow(2, num_vars)) - 1, else: (i + 1) * combinations_per_task - 1
+
+          for combination <- start..finish do
+            binary_combination = Integer.to_string(combination, 2)
+            padded_combination = String.pad_leading(binary_combination, num_vars, "0")
+
+            # Verificar si la combinación satisface todas las cláusulas
+            if satisfies?(padded_combination, clauses) do
+              IO.puts("Satisface: #{padded_combination}")
+            end
+          end
+        end)
       end
-    end
+
+    # Esperar a que todas las tareas finalicen
+    Enum.each(tasks, &Task.await(&1, :infinity))
   end
 
   defp read_file(file_path) do
@@ -39,7 +54,7 @@ defmodule SAT do
               |> Enum.map(&String.trim/1)          # Limpiar espacios en blanco
               |> Enum.filter(&(&1 != ""))          # Ignorar cadenas vacías
               |> Enum.map(&String.to_integer/1)    # Convertir a entero
-              |> Enum.filter(&(&1 != 0))            # Ignorar el cero al final
+              |> Enum.filter(&(&1 != 0))           # Ignorar el cero al final
             {num_vars, [clause | clauses]}
 
           true ->
@@ -65,4 +80,4 @@ defmodule SAT do
 end
 
 # Ejecutar el programa
-SAT.run("CNF/uf20-01.cnf")
+SATP.run("CNF/uf20-01.cnf")
