@@ -1,28 +1,5 @@
 defmodule SAT do
-  def run(file_path) do
-    start_time = System.monotonic_time(:millisecond)
-    {num_vars, clauses} = read_file(file_path)
-
-    IO.puts("Número de variables: #{num_vars}")
-    IO.puts("Número de cláusulas: #{length(clauses)}")
-
-    # Generar todas las combinaciones posibles de valores para las variables
-    for combination <- 0..(trunc(:math.pow(2, num_vars)) - 1) do
-      binary_combination = Integer.to_string(combination, 2)
-      padded_combination = String.pad_leading(binary_combination, num_vars, "0")
-
-      # Verificar si la combinación satisface todas las cláusulas
-      if satisfies?(padded_combination, clauses) do
-        IO.puts("Satisface: #{padded_combination}")
-      end
-
-    end
-    end_time = System.monotonic_time(:millisecond)
-    duration = end_time - start_time
-    IO.puts("Tiempo de ejecución: #{duration} ms")
-  end
-
-  defp read_file(file_path) do
+  def read_file(file_path) do
     {num_vars, clauses} =
       File.read!(file_path)
       |> String.split("\n")
@@ -54,7 +31,7 @@ defmodule SAT do
     {num_vars, Enum.filter(clauses, &(&1 != [])) |> Enum.reverse()} # Filtrar cláusulas vacías
   end
 
-  defp satisfies?(assignment, clauses) do
+  def satisfies?(assignment, clauses) do
     Enum.all?(clauses, fn clause ->
       Enum.any?(clause, fn lit ->
         index = abs(lit) - 1 # Calcula el índice correcto basado en 0
@@ -67,6 +44,3 @@ defmodule SAT do
     end)
   end
 end
-
-# Ejecutar el programa
-SAT.run("CNF/uf20-01.cnf")

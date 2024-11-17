@@ -7,7 +7,7 @@ defmodule SATP do
     IO.puts("Número de cláusulas: #{length(clauses)}")
 
     # Definir el número de tareas (procesos) en paralelo
-    num_tasks = System.schedulers_online() # Usa el número de núcleos disponibles como referencia
+    num_tasks = 1000 # Usa el número de núcleos disponibles como referencia
     IO.puts(num_tasks)
     combinations_per_task = trunc(:math.pow(2, num_vars) / num_tasks)
 
@@ -84,4 +84,4 @@ defmodule SATP do
 end
 
 # Ejecutar el programa
-SATP.run("CNF/uf20-01.cnf")
+SATP.run("CNF/uf20-01000.cnf")
