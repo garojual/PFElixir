@@ -8,7 +8,7 @@ defmodule NodoServidor do
     @nombre_servicio_local |> registrar_servicio()
 
     # Cargar las cláusulas una sola vez
-    {_, clauses} = SAT.read_file("../CNF/uf20-01000.cnf")
+    {_, clauses} = SAT.read_file("../CNF/uf20-01.cnf")
 
     # Activar el servicio con las cláusulas cargadas
     activar_servicio(clauses)
@@ -19,18 +19,19 @@ defmodule NodoServidor do
 
   defp activar_servicio(clauses) do
     receive do
-      {productor, mensaje} ->
+      {productor, mensaje} when mensaje != :fin ->  # Asegúrate de que el servidor solo termine cuando reciba :fin
         procesar_mensaje(mensaje, productor, clauses)
-        activar_servicio(clauses)
-    end
-  end
+        activar_servicio(clauses)  # Mantener esperando más mensajes
 
-  defp procesar_mensaje(:fin, productor, _clauses) do
-    send(productor, :fin)
+      {productor, :fin} ->  # Terminar cuando reciba :fin
+        IO.puts("Finalizando procesamiento de combinaciones.")
+        send(productor, :fin)  # Avisar al cliente que terminó
+    end
   end
 
   defp procesar_mensaje(combination, productor, clauses) do
     if SAT.satisfies?(combination, clauses) do
+      IO.puts("Satisfactoria: #{combination}")
       send(productor, combination)  # Solo envía si satisface las cláusulas
     end
   end

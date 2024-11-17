@@ -1,8 +1,8 @@
 defmodule NodoCliente do
   @nombre_servicio_local :nodo_cliente
-  @servicio_local {@nombre_servicio_local, :nodocliente@localhost}
+  @servicio_local {@nombre_servicio_local, :nodocliente@servidor}
 
-  @nodo_remoto :nodoservidor@localhost
+  @nodo_remoto :nodoservidor@servidor
   @servicio_remoto {:nodo_servidor, @nodo_remoto}
 
   @num_servidores 1  # Define aquí el número de servidores disponibles
@@ -35,19 +35,21 @@ defmodule NodoCliente do
     IO.puts("No se pudo conectar con el nodo servidor")
   end
 
-  defp generar_combinaciones(num_vars) do
-    total = trunc(:math.pow(2, num_vars))
-    chunk_size = div(total, @num_servidores)
+defp generar_combinaciones(num_vars) do
+  total = trunc(:math.pow(2, num_vars))  # Total de combinaciones
+  chunk_size = div(total, @num_servidores)  # División de trabajo por servidor
 
-    # Dividir las combinaciones en rangos para cada servidor
-    Enum.each(0..(@num_servidores - 1), fn i ->
-      start = i * chunk_size
-      finish = if i == @num_servidores - 1, do: total - 1, else: (i + 1) * chunk_size - 1
-      enviar_rango({start, finish, num_vars})
-    end)
+  # Dividir las combinaciones en rangos para cada servidor
+  Enum.each(0..(@num_servidores - 1), fn i ->
+    start = i * chunk_size
+    finish = if i == @num_servidores - 1, do: total - 1, else: (i + 1) * chunk_size - 1
+    enviar_rango({start, finish, num_vars})
+  end)
 
-    enviar_mensaje(:fin)
-  end
+  # Enviar mensaje de fin al servidor
+  enviar_mensaje(:fin)
+end
+
 
   defp enviar_rango({start, finish, num_vars}) do
     # Generar las combinaciones dentro del rango
@@ -79,4 +81,4 @@ defmodule NodoCliente do
 
 end
 
-NodoCliente.main("../CNF/uf20-01000.cnf")
+NodoCliente.main("../CNF/uf20-01.cnf")
