@@ -104,3 +104,5 @@ Verifica si una asignación de variables satisface todas las cláusulas.
   end
 end
 
+# Ejecutar el programa
+SAT.run("./CNF/uf20-01.cnf")
