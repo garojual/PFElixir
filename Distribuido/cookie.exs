@@ -1,4 +1,10 @@
 defmodule Cookie do
+
+  @moduledoc """
+  Módulo para la generación de cookies seguras.
+  Genera una clave aleatoria de longitud fija en bytes, la codifica en Base64 y la imprime en pantalla.
+  """
+
   @longitud_llave 128
 
   def main() do

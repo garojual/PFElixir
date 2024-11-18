@@ -1,5 +1,16 @@
 defmodule NodoServidor do
   @nombre_servicio_local :nodo_servidor
+  @moduledoc """
+  Módulo que representa el nodo servidor en un sistema distribuido para procesar combinaciones
+  generadas por los nodos clientes y verificar si satisfacen las cláusulas de una fórmula en
+  formato CNF.
+
+  ## Funcionalidades:
+  - Registrar el servicio del nodo servidor.
+  - Cargar las cláusulas del archivo CNF una sola vez.
+  - Recibir combinaciones de los nodos clientes y verificar si cumplen con las cláusulas.
+  - Enviar las combinaciones que satisfacen las cláusulas de vuelta al nodo cliente.
+  """
 
   def main() do
     IO.puts("PROCESO SECUNDARIO - Nodo Servidor")
