@@ -1,0 +1,35 @@
+  <html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+
+        ['Archivo CNF', 'Secuencial', 'Paralelo'],
+	['./CNF/uf20-01.cnf', 21654988.5, 4654540.5],
+	['./CNF/uf20-01000.cnf', 10689689.5, 4743423.5],
+  ]);
+
+        var options = {
+          chart: {
+            title: 'Comparación de algoritmos',
+            subtitle: 'Pruebas vs Tiempo de ejecución',
+          }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+    </script>
+  </head>
+  <body>
+    <!--  Fuente de Google Charts
+          https://developers.google.com/chart/interactive/docs/gallery/columnchart#creating-material-column-charts
+      -->
+    <div id="columnchart_material" style="width: 800px; height: 500px;"></div>
+  </body>
+</html>

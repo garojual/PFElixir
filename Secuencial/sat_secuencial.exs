@@ -69,4 +69,4 @@ defmodule SAT do
 end
 
 # Ejecutar el programa
-SAT.run("../CNF/uf20-01.cnf")
+SAT.run("./CNF/uf20-01.cnf")
