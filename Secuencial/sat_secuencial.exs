@@ -1,4 +1,25 @@
 defmodule SAT do
+  @moduledoc """
+  Un módulo para resolver problemas de satisfacibilidad booleana (SAT) en forma
+  normal conjuntiva (CNF) de forma secuencial. Utiliza fuerza bruta para evaluar
+  todas las combinaciones posibles de valores de variables y determina cuáles
+  satisfacen las cláusulas.
+  """
+
+  @doc """
+  Lee un archivo en formato CNF y procesa su contenido.
+
+  - Obtiene el número de variables y una lista de cláusulas.
+  - Ignora comentarios, líneas vacías y literales no válidos.
+
+  ## Parámetros:
+    - `file_path` (String): Ruta al archivo CNF.
+
+  ## Retorna:
+    - Una tupla `{num_vars, clauses}` donde:
+      - `num_vars` (integer): Número de variables.
+      - `clauses` (list): Lista de cláusulas (listas de enteros).
+  """
   def run(file_path) do
     start_time = System.monotonic_time(:millisecond)
     {num_vars, clauses} = read_file(file_path)
@@ -54,6 +75,21 @@ defmodule SAT do
     {num_vars, Enum.filter(clauses, &(&1 != [])) |> Enum.reverse()} # Filtrar cláusulas vacías
   end
 
+
+  @doc """
+Verifica si una asignación de variables satisface todas las cláusulas.
+
+- Una cláusula se considera satisfecha si al menos uno de sus literales es verdadero.
+
+## Parámetros:
+  - `assignment` (String): Una cadena binaria que representa la asignación de valores a las variables.
+    - Ejemplo: `"110"` para 3 variables donde la primera y segunda son verdaderas.
+  - `clauses` (list): Lista de cláusulas a evaluar.
+
+## Retorna:
+  - `true` si la asignación satisface todas las cláusulas.
+  - `false` en caso contrario.
+"""
   defp satisfies?(assignment, clauses) do
     Enum.all?(clauses, fn clause ->
       Enum.any?(clause, fn lit ->
@@ -68,5 +104,3 @@ defmodule SAT do
   end
 end
 
-# Ejecutar el programa
-SAT.run("../CNF/uf20-01.cnf")

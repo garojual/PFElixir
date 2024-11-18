@@ -1,4 +1,12 @@
 defmodule NodoCliente do
+
+   @moduledoc """
+  Módulo que simula un nodo cliente en un sistema distribuido.
+
+  Este nodo cliente lee un archivo CNF, genera combinaciones de valores para las variables,
+  las envía a un servidor remoto para su procesamiento, y recibe las respuestas de si
+  alguna de las combinaciones satisface las cláusulas del problema SAT.
+  """
   @nombre_servicio_local :nodo_cliente
   @servicio_local {@nombre_servicio_local, :nodocliente@localhost}
 
@@ -7,6 +15,15 @@ defmodule NodoCliente do
 
   @num_servidores 1  # Define aquí el número de servidores disponibles
 
+
+  @doc """
+
+  ## Flujo:
+    1. Leer el archivo CNF.
+    2. Registrar el servicio local.
+    3. Verificar la conexión con el nodo servidor.
+    4. Iniciar el productor si la conexión es exitosa.
+  """
   def main(file_path) do
     IO.puts("PROCESO PRINCIPAL - Nodo Cliente")
 
@@ -19,13 +36,42 @@ defmodule NodoCliente do
     @nodo_remoto |> verificar_conexion() |> activar_productor(num_vars)
   end
 
+  @doc """
+  Registra el servicio local con el nombre especificado.
+
+  Este método asegura que el proceso actual sea accesible bajo el nombre de servicio
+  especificado dentro de la red distribuida.
+
+  ## Parámetros:
+    - `nombre_servicio_local`: El nombre del servicio que se quiere registrar.
+  """
   defp registrar_servicio(nombre_servicio_local),
     do: Process.register(self(), nombre_servicio_local)
 
+ @doc """
+  Intenta establecer una conexión con el nodo remoto. Si la conexión es exitosa,
+  activa el productor de combinaciones.
+
+  ## Parámetros:
+    - `nodo_remoto`: El nombre del nodo al que se quiere conectar.
+
+  ## Devuelve:
+    - `:true` si la conexión es exitosa.
+    - `:false` si no se puede conectar al nodo remoto.
+  """
   defp verificar_conexion(nodo_remoto) do
     Node.connect(nodo_remoto)
   end
 
+  @doc """
+
+  Este método genera las combinaciones de valores para las variables, las divide
+  en rangos para ser procesadas por los servidores y las envía para su evaluación.
+
+  ## Parámetros:
+    - `:true` indica que la conexión con el servidor fue exitosa.
+    - `num_vars`: El número de variables que se deben tomar en cuenta para generar las combinaciones.
+  """
   defp activar_productor(:true, num_vars) do
     generar_combinaciones(num_vars)
     recibir_respuestas()
@@ -35,6 +81,15 @@ defmodule NodoCliente do
     IO.puts("No se pudo conectar con el nodo servidor")
   end
 
+  @doc """
+  Genera las combinaciones posibles para las variables y las distribuye entre los servidores.
+
+  El total de combinaciones se divide equitativamente entre los servidores, y cada servidor
+  procesará su rango asignado.
+
+  ## Parámetros:
+    - `num_vars`: El número de variables para las cuales se generarán las combinaciones.
+  """
   defp generar_combinaciones(num_vars) do
     total = trunc(:math.pow(2, num_vars))
     chunk_size = div(total, @num_servidores)

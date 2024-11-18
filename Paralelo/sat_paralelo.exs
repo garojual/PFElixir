@@ -1,4 +1,18 @@
 defmodule SATP do
+  @moduledoc """
+  Módulo para resolver problemas SAT de forma paralela. Utiliza procesamiento concurrente
+  para evaluar combinaciones de asignaciones y determinar si satisfacen un conjunto de cláusulas CNF.
+  """
+
+   @doc """
+  Ejecuta el proceso de resolución SAT dado un archivo en formato CNF.
+
+  ## Parámetros
+    - `file_path`: Ruta al archivo que contiene las cláusulas CNF.
+
+  Lee el archivo, divide las combinaciones posibles en bloques y las procesa en paralelo,
+  mostrando las asignaciones que satisfacen las cláusulas y el tiempo de ejecución.
+  """
   def run(file_path) do
     start_time = System.monotonic_time(:millisecond)
     {num_vars, clauses} = read_file(file_path)
@@ -7,7 +21,7 @@ defmodule SATP do
     IO.puts("Número de cláusulas: #{length(clauses)}")
 
     # Definir el número de tareas (procesos) en paralelo
-    num_tasks = 1000 # Usa el número de núcleos disponibles como referencia
+    num_tasks = 1000 # Punto de mejor rendimiento
     IO.puts(num_tasks)
     combinations_per_task = trunc(:math.pow(2, num_vars) / num_tasks)
 
@@ -37,6 +51,17 @@ defmodule SATP do
     IO.puts("Tiempo de ejecución: #{duration} ms")
   end
 
+   @doc """
+  Lee un archivo en formato CNF y extrae las cláusulas y el número de variables.
+
+  ## Parámetros
+    - `file_path`: Ruta al archivo que contiene las cláusulas CNF.
+
+  ## Retorna
+    - Una tupla `{num_vars, clauses}`:
+      - `num_vars`: Número total de variables en el problema.
+      - `clauses`: Lista de cláusulas representadas como listas de literales.
+  """
   defp read_file(file_path) do
     {num_vars, clauses} =
       File.read!(file_path)
@@ -69,6 +94,17 @@ defmodule SATP do
     {num_vars, Enum.filter(clauses, &(&1 != [])) |> Enum.reverse()} # Filtrar cláusulas vacías
   end
 
+
+  @doc """
+  Verifica si una asignación satisface un conjunto de cláusulas.
+
+  ## Parámetros
+    - `assignment`: Cadena binaria que representa la asignación de valores a las variables.
+    - `clauses`: Lista de cláusulas representadas como listas de literales.
+
+  ## Retorna
+    - `true` si la asignación satisface todas las cláusulas, `false` en caso contrario.
+  """
   defp satisfies?(assignment, clauses) do
     Enum.all?(clauses, fn clause ->
       Enum.any?(clause, fn lit ->
@@ -83,5 +119,4 @@ defmodule SATP do
   end
 end
 
-# Ejecutar el programa
-SATP.run("CNF/uf20-01000.cnf")
+
